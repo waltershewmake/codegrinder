@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 		initializeHttpClient(persistedHost, persistedCookie);
 	}
 
-	let disposable = vscode.commands.registerCommand(
+	let login = vscode.commands.registerCommand(
 		"codegrinder.login",
 		async () => {
 			const loginCode = await vscode.window.showInputBox({
@@ -36,6 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 						vscode.window.showInformationMessage(
 							`Successfully logged in! Welcome, ${user.name}`
 						);
+						assignmentProvider.refresh();
 					})
 					.catch((error) => {
 						vscode.window.showErrorMessage(
@@ -46,9 +47,24 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
-	context.subscriptions.push(disposable);
+	let logout = vscode.commands.registerCommand(
+		"codegrinder.logout",
+		async () => {
+			if (!sdk.isLoggedIn(context)) {
+				vscode.window.showInformationMessage("You are not logged in!");
+				return;
+			}
 
-	const assignmentProvider = new AssignmentProvider();
+			sdk.logout(context);
+			vscode.window.showInformationMessage("Successfully logged out!");
+			assignmentProvider.refresh();
+		}
+	);
+
+	context.subscriptions.push(login);
+	context.subscriptions.push(logout);
+
+	const assignmentProvider = new AssignmentProvider(context);
 	vscode.window.createTreeView("codegrinder", {
 		treeDataProvider: assignmentProvider,
 	});

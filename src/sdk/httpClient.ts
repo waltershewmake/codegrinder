@@ -5,8 +5,8 @@ let host: string | null = null;
 let urlPrefix = "/v2";
 
 export function initializeHttpClient(
-	newHost: string,
-	newSessionCookie: string
+	newHost: string | null,
+	newSessionCookie: string | null
 ) {
 	sessionCookie = newSessionCookie;
 	host = newHost;

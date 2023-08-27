@@ -16,6 +16,10 @@
 			{
 				"command": "codegrinder.login",
 				"title": "CodeGrinder - Login"
+			},
+			{
+				"command": "codegrinder.logout",
+				"title": "CodeGrinder - Logout"
 			}
 		],
 		"viewsContainers": {

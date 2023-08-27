@@ -3,8 +3,8 @@ import { httpClient, initializeHttpClient } from "./httpClient";
 import { User } from "./sdk";
 import { check_version } from "./utils";
 
-let sessionCookie: string;
-let host: string;
+let sessionCookie: string | null;
+let host: string | null;
 
 export function setHost(newHost: string, context: vscode.ExtensionContext) {
 	host = newHost;
@@ -23,6 +23,10 @@ export function setSessionCookie(
 
 export function getHost(context: vscode.ExtensionContext): string | null {
 	return context.globalState.get<string>("host") || host;
+}
+
+export function isLoggedIn(context: vscode.ExtensionContext): boolean {
+	return !!getSessionCookie(context);
 }
 
 export function getSessionCookie(
@@ -71,4 +75,11 @@ export async function login(
 	const user = (await httpClient.must_get("/users/me")).data as User;
 
 	return user;
+}
+
+export async function logout(context: vscode.ExtensionContext) {
+	context.globalState.update("sessionCookie", undefined);
+	context.globalState.update("host", undefined);
+	sessionCookie = null;
+	host = null;
 }
