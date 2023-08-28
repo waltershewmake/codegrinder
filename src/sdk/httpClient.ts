@@ -13,12 +13,12 @@ export function initializeHttpClient(
 }
 
 export const httpClient = axios.create({}) as {
-	must_get: (url: string, config?: any) => Promise<any>;
+	oldGet: (url: string, config?: any) => Promise<any>;
+	mustGet: (url: string, config?: any) => Promise<any>;
 } & AxiosInstance;
 
 // Add a request interceptor to include sessionCookie and host
 httpClient.interceptors.request.use((config) => {
-	console.log("intercepting request", config);
 	if (sessionCookie) {
 		config.headers.Cookie = sessionCookie;
 	}
@@ -29,10 +29,24 @@ httpClient.interceptors.request.use((config) => {
 });
 
 // wrapper around get function, but ensures response exists
-httpClient.must_get = async function (url: string, config?: any) {
+httpClient.mustGet = async function (url: string, config?: any) {
 	let response = await this.get(url, config);
 	if (!response.data) {
 		throw new Error("No response data");
 	}
 	return response;
+};
+
+// get wrapper to allow 404
+httpClient.oldGet = httpClient.get;
+httpClient.get = async function (url: string, config?: any) {
+	try {
+		return await this.oldGet(url, config);
+	} catch (e: any) {
+		if (e.response && e.response.status === 404) {
+			// return e.response;
+			return null;
+		}
+		throw e;
+	}
 };

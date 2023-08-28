@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { httpClient, initializeHttpClient } from "./httpClient";
-import { User } from "./sdk";
+import { getUser } from "./user";
 import { check_version } from "./utils";
 
 let sessionCookie: string | null;
@@ -61,7 +61,7 @@ export async function login(
 
 			return session.data;
 		})
-		.catch((error) => {
+		.catch(() => {
 			throw new Error(
 				"Make sure you use a fresh login code (no more than 5 minutes old)."
 			);
@@ -72,7 +72,7 @@ export async function login(
 	check_version();
 
 	// check if able to get user
-	const user = (await httpClient.must_get("/users/me")).data as User;
+	const user = getUser(true);
 
 	return user;
 }

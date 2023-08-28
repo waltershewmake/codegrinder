@@ -1,4 +1,4 @@
-// export * from "./assignments";
+export * from "./assignments";
 export * from "./auth";
-// export * from "./classes";
+export * from "./courses";
 export * from "./user";
